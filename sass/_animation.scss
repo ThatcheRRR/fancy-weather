@@ -1,0 +1,50 @@
+@keyframes refreshing {
+    from {
+        transform: rotate(0deg);
+    }
+    10% {
+        transform: rotate(-45deg);
+    }
+    60% {
+        transform: rotate(405deg);
+    }
+    90% {
+        transform: rotate(315deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes hovering {
+    from {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(-45deg);
+    }
+    to {
+        transform: rotate(45deg);
+    }
+}
+
+@keyframes coloring {
+    from {
+        background-color: yellow
+    }
+    to {
+        background-color: blue;
+    }
+}
+
+@keyframes loading {
+    from { 
+        background-position: 0% 91% 
+    }
+    50% {
+        background-position: 100% 10% 
+    }
+    to {
+        background-position: 0% 91%
+    }
+}
