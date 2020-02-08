@@ -12,6 +12,9 @@ const refresh = document.querySelector('.refresh');
 const loading = document.querySelector('.loading');
 const dateBlock = document.querySelector('.date');
 const futureForecast = document.querySelector('.future-forecast');
+const curIcon = document.querySelector('.cur-icon');
+const favBlock = document.querySelector("link[rel*='icon']");
+const favicon = document.querySelector('.favicon');
 const date = new Date();
 const enterCode = 13;
 
@@ -46,6 +49,7 @@ let getCity;
 let translate;
 let timeNow;
 let curWeather;
+let fav;
 let myMap = null;
 
 function initMap(cords) {
@@ -113,12 +117,23 @@ const usersLocationWeather = function() {
                                 daysForward.push(day);
                                 dailyIcons.push(icons);
                             }
+                            const options = { timeZone: data.timezone }
+                            const localTime = new Date(new Date().toLocaleString('en-US', options));
+                            const timeArr = `${localTime}`.split(' ');
+                            const locTime = [];
+                            const timeConv = timeArr[4].split(':').slice(0, 2).join(':');
+                            const weekDay = shortDay_EN.indexOf(timeArr[0]);
+                            const month = localTime.getMonth();
+                            locTime.push(timeArr[2], timeConv, weekDay, month);
+                            getCurrentTime(locTime);
                             getDailyWeather();
+                            fav = data.currently.icon;
+                            getFavicon(fav, favicon);
                             mapCoords.push(data.latitude, data.longitude);
                             curWeather = data.currently.summary;
                             currentWeatherCels.push(data.currently.summary, Math.round((data.currently.apparentTemperature - 32) * (5 / 9)), Math.round(data.currently.windSpeed * 1.609 / 3.6), Math.round(data.currently.humidity * 100), Math.round((data.currently.temperature - 32) * (5 / 9)));
                             currentWeatherFahr.push(data.currently.summary, Math.round(data.currently.apparentTemperature), Math.round(data.currently.windSpeed * 1.609 / 3.6), Math.round(data.currently.humidity * 100), Math.round(data.currently.temperature));
-                            setIcon(data.currently.icon, document.querySelector('.cur-icon'));
+                            setIcon(data.currently.icon, curIcon);
                             init();
                             getImage();
                             return data;
@@ -129,7 +144,10 @@ const usersLocationWeather = function() {
                         })
                 })
         })
-        .finally(setTimeout(loaded, 2000));
+        .finally(() => {
+            setTimeout(loaded, 2000);
+            setInterval(setFavicon, 100);
+        });
 }
 
 const loadForecast = function() {
@@ -150,27 +168,58 @@ const loadForecast = function() {
         fetch(weather_url, { method: 'GET', mode: 'cors' })
             .then(forecast => forecast.json())
             .then(data => {
-                for (let i = 1; i < 4; i += 1) {
-                    const day = new Date(data.daily.data[i].time * 1000).getDay();
-                    const temperFahr = Math.round((data.daily.data[i].temperatureHigh + data.daily.data[i].temperatureLow) / 2);
-                    const temperCels = Math.round((((data.daily.data[i].temperatureHigh + data.daily.data[i].temperatureLow) / 2) - 32) * (5 / 9));
-                    const icons = data.daily.data[i].icon;
-                    dailyFahr.push(temperFahr);
-                    dailyCels.push(temperCels);
-                    daysForward.push(day);
-                    dailyIcons.push(icons);
+                const options = { timeZone: data.timezone }
+                const localTime = new Date(new Date().toLocaleString('en-US', options));
+                const timeArr = `${localTime}`.split(' ');
+                const weekDay = shortDay_EN.indexOf(timeArr[0]);
+                const month = localTime.getMonth();
+                const locTime = [];
+                const timeConv = timeArr[4].split(':').slice(0, 2).join(':');
+                let day = localTime.getDay();
+                locTime.push(timeArr[2], timeConv, weekDay, month);
+                getCurrentTime(locTime);
+                if (weekDay !== date.getDay()) {
+                    for (let i = 2; i < 5; i += 1) {
+                        day++;
+                        if (day > 6) {
+                            day = 0;
+                        }
+                        const temperFahr = Math.round((data.daily.data[i].temperatureHigh + data.daily.data[i].temperatureLow) / 2);
+                        const temperCels = Math.round((((data.daily.data[i].temperatureHigh + data.daily.data[i].temperatureLow) / 2) - 32) * (5 / 9));
+                        const icons = data.daily.data[i].icon;
+                        dailyFahr.push(temperFahr);
+                        dailyCels.push(temperCels);
+                        daysForward.push(day);
+                        dailyIcons.push(icons);
+                    }
+                } else {
+                    for (let i = 1; i < 4; i += 1) {
+                        day++;
+                        if (day > 6) {
+                            day = 0;
+                        }
+                        const temperFahr = Math.round((data.daily.data[i].temperatureHigh + data.daily.data[i].temperatureLow) / 2);
+                        const temperCels = Math.round((((data.daily.data[i].temperatureHigh + data.daily.data[i].temperatureLow) / 2) - 32) * (5 / 9));
+                        const icons = data.daily.data[i].icon;
+                        dailyFahr.push(temperFahr);
+                        dailyCels.push(temperCels);
+                        daysForward.push(day);
+                        dailyIcons.push(icons);
+                    }
                 }
                 getDailyWeather();
+                fav = data.currently.icon;
+                getFavicon(fav, favicon);
                 mapCoords.push(data.latitude, data.longitude);
                 currentWeatherCels.push(data.currently.summary, Math.round((data.currently.apparentTemperature - 32) * (5 / 9)), Math.round(data.currently.windSpeed * 1.609 / 3.6), Math.round(data.currently.humidity * 100), Math.round((data.currently.temperature - 32) * (5 / 9)));
                 currentWeatherFahr.push(data.currently.summary, Math.round(data.currently.apparentTemperature), Math.round(data.currently.windSpeed * 1.609 / 3.6), Math.round(data.currently.humidity * 100), Math.round(data.currently.temperature));
-                setIcon(data.currently.icon, document.querySelector('.cur-icon'));
+                setIcon(data.currently.icon, curIcon);
                 init();
-                getImage();
                 return data;
             })
             .then(info => {
                 myMap.setCenter([info.latitude, info.longitude]);
+                setInterval(setFavicon, 100);
             })
     })
 }
@@ -186,32 +235,49 @@ function setIcon(icon, iconID) {
     return skycons.set(iconID, Skycons[currentIcon]);
 }
 
-function getCurrentTime() {
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-    if (+hours < 10) {
-        hours = '0' + hours;
+function getFavicon(icon, iconID) {
+    const skycons = new Skycons({ color: '#000' });
+    const currentIcon = icon.replace(/-/g, '_').toUpperCase();
+    skycons.play();
+    return skycons.set(iconID, Skycons[currentIcon]);
+}
+
+function setFavicon() {
+    favBlock.href = favicon.toDataURL();
+}
+
+function getCurrentTime(locTime) {
+    const getTime = locTime[1].split(':');
+    let hours = getTime[0];
+    let minutes = getTime[1];
+    let currentDate = +locTime[0];
+    let currentDay;
+    let currentMonth;
+    dateBlock.textContent = '';
+    if (curLang === 'en') {
+        currentDay = shortDay_EN[locTime[2]];
+        currentMonth = month_EN[locTime[3]];
     }
-    if (+minutes < 10) {
-        minutes = '0' + minutes;
+    if (curLang === 'ru') {
+        currentDay = shortDay_RU[locTime[2]];
+        currentMonth = month_RU[locTime[3]];
+    }
+    if (curLang === 'be') {
+        currentDay = shortDay_BE[locTime[2]];
+        currentMonth = month_BE[locTime[3]];
     }
     timeNow = `${hours}:${minutes}`;
-    return timeNow;
+    dateBlock.textContent = `${currentDay} ${currentDate} ${currentMonth} ${timeNow}`;
 }
 
 function init() {
-    getCurrentTime();
     const latitGrad = `${mapCoords[0]}`.split('.');
     const longGrad = `${mapCoords[1]}`.split('.');
     const latit = `${latitGrad[0]}° ${latitGrad[1].slice(0, 2)}'`;
     const longit = `${longGrad[0]}° ${longGrad[1].slice(0, 2)}'`;
-    let currentDay;
-    let currentDate;
-    let currentMonth;
     let currentWeather = [];
     coordBlock.textContent = '';
     block.textContent = '';
-    dateBlock.textContent = '';
     locBlock.textContent = translate;
     if (celsius.classList.contains('active-temp')) {
         currentWeather = currentWeatherCels;
@@ -232,9 +298,6 @@ function init() {
         <div class = "lan">${coords_EN[0]}: ${latit}</div>
         <div class = "long">${coords_EN[1]}: ${longit}</div>
         `)
-        currentDay = shortDay_EN[date.getDay()];
-        currentDate = date.getDate();
-        currentMonth = month_EN[date.getMonth()];
     }
     if (curLang === 'be') {
         text.placeholder = 'Пошук горада ці індэкса';
@@ -248,9 +311,6 @@ function init() {
         <div class = "lan">${coords_BE[0]}: ${latit}</div>
         <div class = "long">${coords_BE[1]}: ${longit}</div>
         `)
-        currentDay = shortDay_BE[date.getDay()];
-        currentDate = date.getDate();
-        currentMonth = month_BE[date.getMonth()];
     }
     if (curLang === 'ru') {
         search.textContent = 'Искать';
@@ -264,11 +324,7 @@ function init() {
         <div class = "lan">${coords_RU[0]}: ${latit}</div>
         <div class = "long">${coords_RU[1]}: ${longit}</div>
         `)
-        currentDay = shortDay_RU[date.getDay()];
-        currentDate = date.getDate();
-        currentMonth = month_RU[date.getMonth()];
     }
-    dateBlock.textContent = `${currentDay} ${currentDate} ${currentMonth} ${timeNow}`;
 }
 
 function changeTemp(e) {
@@ -285,6 +341,7 @@ function pressed(e) {
         city = text.value;
         e.preventDefault();
         loadForecast();
+        getImage();
     }
 }
 
@@ -307,6 +364,7 @@ function getDailyWeather() {
     if (curLang === 'en') {
         daysOfWeek = daysOfWeek_EN;
     }
+    console.log(daysOfWeek, daysForward)
     for (let i = 0; i < 3; i += 1) {
         futureForecast.insertAdjacentHTML('beforeend', `
         <div class = "fut-weather">
@@ -344,6 +402,7 @@ celsius.addEventListener('click', changeTemp);
 fahrenheit.addEventListener('click', changeTemp);
 text.addEventListener('keydown', pressed);
 refresh.addEventListener('click', getImage);
+search.addEventListener('click', getImage);
 window.onbeforeunload = () => {
     localStorage.setItem('usersLang', curLang);
 }

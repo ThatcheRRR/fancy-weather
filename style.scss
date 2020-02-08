@@ -97,6 +97,12 @@ main {
     }
 }
 
+.favicon {
+    width: 0px;
+    height: 0px;
+    display: none;
+}
+
 .active-temp {
     background: rgba(174, 181, 185, 0.5);
 }
@@ -150,7 +156,6 @@ main {
     border-radius: 10px;
 }
 .loading {
-    // display: none;
     z-index: 99999;
     position: absolute;
     top: 0;

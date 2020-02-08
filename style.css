@@ -351,6 +351,12 @@ main {
   cursor: pointer;
 }
 
+.favicon {
+  width: 0px;
+  height: 0px;
+  display: none;
+}
+
 .active-temp {
   background: rgba(174, 181, 185, 0.5);
 }
