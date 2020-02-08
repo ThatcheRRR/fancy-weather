@@ -128,7 +128,7 @@ const usersLocationWeather = function() {
                             getCurrentTime(locTime);
                             getDailyWeather();
                             fav = data.currently.icon;
-                            getFavicon(fav, favicon);
+                            getFavicon(fav, document.querySelector('.favicon'));
                             mapCoords.push(data.latitude, data.longitude);
                             curWeather = data.currently.summary;
                             currentWeatherCels.push(data.currently.summary, Math.round((data.currently.apparentTemperature - 32) * (5 / 9)), Math.round(data.currently.windSpeed * 1.609 / 3.6), Math.round(data.currently.humidity * 100), Math.round((data.currently.temperature - 32) * (5 / 9)));
@@ -209,7 +209,7 @@ const loadForecast = function() {
                 }
                 getDailyWeather();
                 fav = data.currently.icon;
-                getFavicon(fav, favicon);
+                getFavicon(fav, document.querySelector('.favicon'));
                 mapCoords.push(data.latitude, data.longitude);
                 currentWeatherCels.push(data.currently.summary, Math.round((data.currently.apparentTemperature - 32) * (5 / 9)), Math.round(data.currently.windSpeed * 1.609 / 3.6), Math.round(data.currently.humidity * 100), Math.round((data.currently.temperature - 32) * (5 / 9)));
                 currentWeatherFahr.push(data.currently.summary, Math.round(data.currently.apparentTemperature), Math.round(data.currently.windSpeed * 1.609 / 3.6), Math.round(data.currently.humidity * 100), Math.round(data.currently.temperature));
@@ -243,7 +243,7 @@ function getFavicon(icon, iconID) {
 }
 
 function setFavicon() {
-    favBlock.href = favicon.toDataURL();
+    document.querySelector("link[rel*='icon']").href = favicon.toDataURL();
 }
 
 function getCurrentTime(locTime) {
