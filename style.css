@@ -227,6 +227,7 @@ h1 {
 
 body {
   padding: 0 90px;
+  background-image: url("bg3.png");
   background-size: cover;
   background-repeat: no-repeat;
   background-color: #c4c4c4;
