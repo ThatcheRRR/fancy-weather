@@ -13,8 +13,6 @@ const loading = document.querySelector('.loading');
 const dateBlock = document.querySelector('.date');
 const futureForecast = document.querySelector('.future-forecast');
 const curIcon = document.querySelector('.cur-icon');
-const favBlock = document.querySelector("link[rel*='icon']");
-const favicon = document.querySelector('.favicon');
 const date = new Date();
 const enterCode = 13;
 
