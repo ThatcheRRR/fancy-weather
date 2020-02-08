@@ -243,7 +243,7 @@ function getFavicon(icon, iconID) {
 }
 
 function setFavicon() {
-    document.querySelector("link[rel*='icon']").href = favicon.toDataURL();
+    document.querySelector("link[rel*='icon']").href = document.querySelector('.favicon').toDataURL();
 }
 
 function getCurrentTime(locTime) {
@@ -364,7 +364,6 @@ function getDailyWeather() {
     if (curLang === 'en') {
         daysOfWeek = daysOfWeek_EN;
     }
-    console.log(daysOfWeek, daysForward)
     for (let i = 0; i < 3; i += 1) {
         futureForecast.insertAdjacentHTML('beforeend', `
         <div class = "fut-weather">
