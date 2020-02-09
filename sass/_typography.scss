@@ -78,3 +78,10 @@ h1 {
     text-align: center;
     color: #c4c4c4;
 }
+
+@media (max-width: 1030px) {
+    .cur_degree {
+        font-size: calc(29vw);
+        line-height: calc(36vw);
+    }
+}
