@@ -432,6 +432,7 @@ main {
 
 .weather__item {
   margin: 0;
+  max-width: 320px;
 }
 
 .future-forecast {

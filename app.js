@@ -27,7 +27,7 @@ const daysOfWeek_BE = ['Нядзеля', 'Панядзелак', 'Аўторак
 const month_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const month_RU = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'];
 const month_BE = ['Студзеня', 'Лютага', 'Сакавіка', 'Красавіка', 'Мая', 'Чэрвеня', 'Ліпеня', 'Жніўня', 'Верасня', 'Кастрычніка', 'Лістапада', 'Снежня'];
-const shortDay_EN = ['Sun', 'Mon', 'Tue', 'Wen', 'Th', 'Fri', 'Sat'];
+const shortDay_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const shortDay_RU = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 const shortDay_BE = ['Нд', 'Пн', 'Аў', 'Ср', 'Чц', 'Пт', 'Сб'];
 const coords_EN = ['Latitude', 'Longitude'];
@@ -123,6 +123,7 @@ const usersLocationWeather = function() {
                             const weekDay = shortDay_EN.indexOf(timeArr[0]);
                             const month = localTime.getMonth();
                             locTime.push(timeArr[2], timeConv, weekDay, month);
+                            console.log(timeArr)
                             getCurrentTime(locTime);
                             getDailyWeather();
                             fav = data.currently.icon;

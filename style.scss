@@ -144,6 +144,7 @@ main {
     flex-direction: column;
     &__item {
         margin: 0;
+        max-width: 320px;
     }
 }
 .future-forecast {
