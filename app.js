@@ -123,7 +123,6 @@ const usersLocationWeather = function() {
                             const weekDay = shortDay_EN.indexOf(timeArr[0]);
                             const month = localTime.getMonth();
                             locTime.push(timeArr[2], timeConv, weekDay, month);
-                            console.log(timeArr)
                             getCurrentTime(locTime);
                             getDailyWeather();
                             fav = data.currently.icon;
@@ -149,7 +148,7 @@ const usersLocationWeather = function() {
         });
 }
 
-const loadForecast = function() {
+const loadForecast = function(lang) {
     currentWeatherCels.length = 0;
     currentWeatherFahr.length = 0;
     mapCoords.length = 0;
@@ -157,13 +156,13 @@ const loadForecast = function() {
     daysForward.length = 0;
     dailyCels.length = 0;
     dailyIcons.length = 0;
-    const location_url = `https://api.opencagedata.com/geocode/v1/json?key=${location_key}&q=${city}&pretty=1&no_annotations=1&language=${curLang}`;
+    const location_url = `https://api.opencagedata.com/geocode/v1/json?key=${location_key}&q=${city}&pretty=1&no_annotations=1&language=${lang}`;
     fetch(location_url)
         .then(data => data.json())
         .then(location => {
         getCity = location.results[0].formatted.split(',');
         translate = `${getCity[0]}, ${getCity[getCity.length - 1]}`;
-        const weather_url = `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/29e270d552fb7ddfac1a8c371ae8dc03/${location.results[0].geometry.lat},${location.results[0].geometry.lng}?lang=${curLang}`;
+        const weather_url = `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/29e270d552fb7ddfac1a8c371ae8dc03/${location.results[0].geometry.lat},${location.results[0].geometry.lng}?lang=${lang}`;
         fetch(weather_url, { method: 'GET', mode: 'cors' })
             .then(forecast => forecast.json())
             .then(data => {
@@ -382,10 +381,10 @@ search.addEventListener('click', loadForecast);
 search.onmousemove = () => {
     city = text.value;
 }
-lang.addEventListener('mouseout', () => {
-    curLang = lang.value.toLowerCase();
+lang.addEventListener('click', (e) => {
+    curLang = e.target.value.toLowerCase();
+    loadForecast(curLang);
 });
-lang.addEventListener('mouseout', loadForecast);
 window.onload = () => {
     curLang = 'en';
     lang.value = curLang.toUpperCase();

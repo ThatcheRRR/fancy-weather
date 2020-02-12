@@ -102,6 +102,7 @@ main {
         border-bottom-right-radius: 5px;
         &:hover {
             cursor: pointer;
+            background: lighten(rgba(174, 181, 185, 0.5), 15%);
         }
     }
 }

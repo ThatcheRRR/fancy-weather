@@ -369,6 +369,7 @@ main {
 
 .search__submit:hover {
   cursor: pointer;
+  background: rgba(215, 218, 220, 0.5);
 }
 
 .favicon {
