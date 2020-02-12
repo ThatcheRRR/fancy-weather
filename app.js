@@ -381,7 +381,7 @@ search.addEventListener('click', loadForecast);
 search.onmousemove = () => {
     city = text.value;
 }
-lang.addEventListener('click', (e) => {
+lang.addEventListener('mouseup', (e) => {
     curLang = e.target.value.toLowerCase();
     loadForecast(curLang);
 });
