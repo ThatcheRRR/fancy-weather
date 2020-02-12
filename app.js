@@ -383,6 +383,7 @@ search.onmousemove = () => {
 }
 lang.addEventListener('mouseup', (e) => {
     curLang = e.target.value.toLowerCase();
+    alert(curLang)
     loadForecast(curLang);
 });
 window.onload = () => {
