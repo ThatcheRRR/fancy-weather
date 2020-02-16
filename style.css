@@ -467,6 +467,7 @@ main {
 
 .location {
   width: 100%;
+  max-width: 1050px;
 }
 
 .coords {

@@ -105,18 +105,16 @@ const options = {
     maximumAge: 0
 };
 
+navigator.geolocation.getCurrentPosition(success, error, options);
+
 const usersLocationWeather = function() {
-    const current_location_url = `https://ipinfo.io/json?token=${current_location_key}`;
-    fetch(current_location_url)
-        .then(locInfo => locInfo.json())
-        .then(location => {
-            city = location.city;
-            const location_url = `https://api.opencagedata.com/geocode/v1/json?key=${location_key}&q=${city}&pretty=1&no_annotations=1&language=${curLang}`;
+    const pos = `${crd.latitude}, ${crd.longitude}`;
+        const location_url = `https://api.opencagedata.com/geocode/v1/json?key=${location_key}&q=${pos}&pretty=1&no_annotations=1&language=${curLang}`;
         fetch(location_url)
         .then(locat => locat.json())
         .then(location => {
-            getCity = location.results[0].formatted.split(',');
-            translate = `${getCity[0]}, ${getCity[getCity.length - 1]}`;
+            city = location.results[0].components.city;
+            translate = `${location.results[0].components.city}, ${location.results[0].components.country}`;
             return location;
         })
         .then(loc => {
@@ -155,7 +153,7 @@ const usersLocationWeather = function() {
                     ymaps.ready(initMap(cords));
                 })
         })
-    })
+    // })
     .finally(() => {
         setTimeout(loaded, 2000);
         setInterval(setFavicon, 100);
