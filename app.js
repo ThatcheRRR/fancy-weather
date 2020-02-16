@@ -48,6 +48,7 @@ let translate;
 let timeNow;
 let curWeather;
 let fav;
+let crd;
 let usersInt;
 let myMap = null;
 
@@ -87,61 +88,71 @@ function getImage() {
         })
 }
 
+function success(pos) {
+    crd = pos.coords;
+
+}
+
+function error(err) {
+    console.warn(`ERROR(${err.code}): ${err.message}`);
+}
+
+const options = {
+    enableHighAccuracy: true,
+    timeout: 0,
+    maximumAge: 0
+};
+
+navigator.geolocation.getCurrentPosition(success, error, options);
+
 const usersLocationWeather = function() {
-    const current_location_url = `https://ipinfo.io/json?token=${current_location_key}`;
-    fetch(current_location_url)
-        .then(locInfo => locInfo.json())
+    const location_url = `https://api.opencagedata.com/geocode/v1/json?key=${location_key}&q=${crd.latitude},${crd.longitude}&pretty=1&no_annotations=1&language=${curLang}`;
+    fetch(location_url)
+        .then(locat => locat.json())
         .then(location => {
-            city = location.city;
-            const location_url = `https://api.opencagedata.com/geocode/v1/json?key=${location_key}&q=${city}&pretty=1&no_annotations=1&language=${curLang}`;
-            fetch(location_url)
-                .then(locat => locat.json())
-                .then(location => {
-                    getCity = location.results[0].formatted.split(',');
-                    translate = `${getCity[0]}, ${getCity[getCity.length - 1]}`;
-                    return location;
+            translate = `${location.results[0].components.city}, ${location.results[0].components.country}`;
+            return location;
+        })
+        .then(loc => {
+            const weather_url = `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/29e270d552fb7ddfac1a8c371ae8dc03/${loc.results[0].geometry.lat},${loc.results[0].geometry.lng}?lang=${curLang}`;
+            fetch(weather_url, {headers: {}})
+                .then(weather => weather.json())
+                .then(data => {
+                    for (let i = 1; i < 4; i += 1) {
+                        const day = new Date(data.daily.data[i].time * 1000).getDay();
+                        const temperFahr = Math.round((data.daily.data[i].temperatureHigh + data.daily.data[i].temperatureLow) / 2);
+                        const temperCels = Math.round((((data.daily.data[i].temperatureHigh + data.daily.data[i].temperatureLow) / 2) - 32) * (5 / 9));
+                        const icons = data.daily.data[i].icon;
+                        dailyFahr.push(temperFahr);
+                        dailyCels.push(temperCels);
+                        daysForward.push(day);
+                        dailyIcons.push(icons);
+                    }
+                    function updateUsers() {
+                        usersInt = setInterval(updateDate, 1000, data);
+                    }
+                    updateUsers();
+                    getDailyWeather();
+                    fav = data.currently.icon;
+                    getFavicon(fav, document.querySelector('.favicon'));
+                    mapCoords.push(data.latitude, data.longitude);
+                    curWeather = data.currently.summary;
+                    currentWeatherCels.push(data.currently.summary, Math.round((data.currently.apparentTemperature - 32) * (5 / 9)), Math.round(data.currently.windSpeed * 1.609 / 3.6), Math.round(data.currently.humidity * 100), Math.round((data.currently.temperature - 32) * (5 / 9)));
+                    currentWeatherFahr.push(data.currently.summary, Math.round(data.currently.apparentTemperature), Math.round(data.currently.windSpeed * 1.609 / 3.6), Math.round(data.currently.humidity * 100), Math.round(data.currently.temperature));
+                    setIcon(data.currently.icon, curIcon);
+                    init();
+                    getImage();
+                    return data;
                 })
-                .then(loc => {
-                    const weather_url = `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/29e270d552fb7ddfac1a8c371ae8dc03/${loc.results[0].geometry.lat},${loc.results[0].geometry.lng}?lang=${curLang}`;
-                    fetch(weather_url, {headers: {}})
-                        .then(weather => weather.json())
-                        .then(data => {
-                            for (let i = 1; i < 4; i += 1) {
-                                const day = new Date(data.daily.data[i].time * 1000).getDay();
-                                const temperFahr = Math.round((data.daily.data[i].temperatureHigh + data.daily.data[i].temperatureLow) / 2);
-                                const temperCels = Math.round((((data.daily.data[i].temperatureHigh + data.daily.data[i].temperatureLow) / 2) - 32) * (5 / 9));
-                                const icons = data.daily.data[i].icon;
-                                dailyFahr.push(temperFahr);
-                                dailyCels.push(temperCels);
-                                daysForward.push(day);
-                                dailyIcons.push(icons);
-                            }
-                            function updateUsers() {
-                                usersInt = setInterval(updateDate, 1000, data);
-                            }
-                            updateUsers();
-                            getDailyWeather();
-                            fav = data.currently.icon;
-                            getFavicon(fav, document.querySelector('.favicon'));
-                            mapCoords.push(data.latitude, data.longitude);
-                            curWeather = data.currently.summary;
-                            currentWeatherCels.push(data.currently.summary, Math.round((data.currently.apparentTemperature - 32) * (5 / 9)), Math.round(data.currently.windSpeed * 1.609 / 3.6), Math.round(data.currently.humidity * 100), Math.round((data.currently.temperature - 32) * (5 / 9)));
-                            currentWeatherFahr.push(data.currently.summary, Math.round(data.currently.apparentTemperature), Math.round(data.currently.windSpeed * 1.609 / 3.6), Math.round(data.currently.humidity * 100), Math.round(data.currently.temperature));
-                            setIcon(data.currently.icon, curIcon);
-                            init();
-                            getImage();
-                            return data;
-                        })
-                        .then(info => {
-                            let cords = [info.latitude,info.longitude];
-                            ymaps.ready(initMap(cords));
-                        })
+                .then(info => {
+                    let cords = [info.latitude,info.longitude];
+                    ymaps.ready(initMap(cords));
                 })
         })
-        .finally(() => {
-            setTimeout(loaded, 2000);
-            setInterval(setFavicon, 100);
-        });
+    .finally(() => {
+        setTimeout(loaded, 2000);
+        setInterval(setFavicon, 100);
+    });
 }
 
 const loadForecast = function() {
@@ -157,10 +168,9 @@ const loadForecast = function() {
     fetch(location_url)
         .then(data => data.json())
         .then(location => {
-        getCity = location.results[0].formatted.split(',');
-        translate = `${getCity[0]}, ${getCity[getCity.length - 1]}`;
-        const weather_url = `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/29e270d552fb7ddfac1a8c371ae8dc03/${location.results[0].geometry.lat},${location.results[0].geometry.lng}?lang=${curLang}`;
-        fetch(weather_url, { method: 'GET', mode: 'cors' })
+            translate = `${location.results[0].components.city}, ${location.results[0].components.country}`;
+            const weather_url = `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/29e270d552fb7ddfac1a8c371ae8dc03/${location.results[0].geometry.lat},${location.results[0].geometry.lng}?lang=${curLang}`;
+            fetch(weather_url, { method: 'GET', mode: 'cors' })
             .then(forecast => forecast.json())
             .then(data => {
                 let day;
