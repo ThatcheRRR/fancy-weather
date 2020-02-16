@@ -43,6 +43,8 @@ const dailyCels = [];
 const dailyIcons = [];
 let curLang;
 let city;
+let day;
+let weekDay;
 let getCity;
 let translate;
 let timeNow;
@@ -180,17 +182,8 @@ const loadForecast = function() {
             fetch(weather_url, { method: 'GET', mode: 'cors' })
             .then(forecast => forecast.json())
             .then(data => {
-                let day;
-                let weekDay;
-                const options = { timeZone: data.timezone }
-                const localTime = new Date(new Date().toLocaleString('en-US', options));
-                const timeArr = `${localTime}`.split(' ');
-                weekDay = shortDay_EN.indexOf(timeArr[0]);
-                day = localTime.getDay();
-                function locationTime() {
-                    locInt = setInterval(updateDate, 1000, data);
-                }
-                locationTime();
+                updateDate(data);
+                locInt = setInterval(updateDate, 1000, data);
                 if (weekDay !== date.getDay()) {
                     for (let i = 2; i < 5; i += 1) {
                         day++;
