@@ -91,7 +91,7 @@ function getImage() {
 
 function success(pos) {
     crd = pos.coords;
-
+    console.log(crd)
 }
 
 function error(err) {
@@ -100,18 +100,22 @@ function error(err) {
 
 const options = {
     enableHighAccuracy: true,
-    timeout: 0,
+    timeout: 5000,
     maximumAge: 0
 };
 
-navigator.geolocation.getCurrentPosition(success, error, options);
-
 const usersLocationWeather = function() {
-    const location_url = `https://api.opencagedata.com/geocode/v1/json?key=${location_key}&q=${crd.latitude},${crd.longitude}&pretty=1&no_annotations=1&language=${curLang}`;
-    fetch(location_url)
+    const current_location_url = `https://ipinfo.io/json?token=${current_location_key}`;
+    fetch(current_location_url)
+        .then(locInfo => locInfo.json())
+        .then(location => {
+            city = location.city;
+            const location_url = `https://api.opencagedata.com/geocode/v1/json?key=${location_key}&q=${city}&pretty=1&no_annotations=1&language=${curLang}`;
+        fetch(location_url)
         .then(locat => locat.json())
         .then(location => {
-            translate = `${location.results[0].components.city}, ${location.results[0].components.country}`;
+            getCity = location.results[0].formatted.split(',');
+            translate = `${getCity[0]}, ${getCity[getCity.length - 1]}`;
             return location;
         })
         .then(loc => {
@@ -150,6 +154,7 @@ const usersLocationWeather = function() {
                     ymaps.ready(initMap(cords));
                 })
         })
+    })
     .finally(() => {
         setTimeout(loaded, 2000);
         setInterval(setFavicon, 100);
@@ -166,11 +171,18 @@ const loadForecast = function() {
     daysForward.length = 0;
     dailyCels.length = 0;
     dailyIcons.length = 0;
-    const location_url = `https://api.opencagedata.com/geocode/v1/json?key=${location_key}&q=${city}&pretty=1&no_annotations=1&language=${curLang}`;
+    let search;
+    if (!city) {
+        search = `${crd.latitude}, ${crd.longitude}`;
+    } else {
+        search = city;
+    }
+    const location_url = `https://api.opencagedata.com/geocode/v1/json?key=${location_key}&q=${search}&pretty=1&no_annotations=1&language=${curLang}`;
     fetch(location_url)
         .then(data => data.json())
         .then(location => {
-            translate = `${location.results[0].formatted}`;
+            getCity = location.results[0].formatted.split(',');
+            translate = `${getCity[0]}, ${getCity[getCity.length - 1]}`;
             const weather_url = `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/29e270d552fb7ddfac1a8c371ae8dc03/${location.results[0].geometry.lat},${location.results[0].geometry.lng}?lang=${curLang}`;
             fetch(weather_url, { method: 'GET', mode: 'cors' })
             .then(forecast => forecast.json())
