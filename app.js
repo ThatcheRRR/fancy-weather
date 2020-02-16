@@ -91,7 +91,6 @@ function getImage() {
 
 function success(pos) {
     crd = pos.coords;
-    console.log(crd)
 }
 
 function error(err) {
@@ -221,7 +220,6 @@ const loadForecast = function() {
                         dailyIcons.push(icons);
                     }
                 }
-                console.log(day)
                 getDailyWeather();
                 fav = data.currently.icon;
                 getFavicon(fav, document.querySelector('.favicon'));
@@ -392,7 +390,6 @@ function getDailyWeather() {
     if (curLang === 'en') {
         daysOfWeek = daysOfWeek_EN;
     }
-    console.log(daysOfWeek[daysForward[1]])
     for (let i = 0; i < 3; i += 1) {
         futureForecast.insertAdjacentHTML('beforeend', `
         <div class = "fut-weather">
