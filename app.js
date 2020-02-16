@@ -171,13 +171,7 @@ const loadForecast = function() {
     daysForward.length = 0;
     dailyCels.length = 0;
     dailyIcons.length = 0;
-    let search;
-    if (!city) {
-        search = `${crd.latitude}, ${crd.longitude}`;
-    } else {
-        search = city;
-    }
-    const location_url = `https://api.opencagedata.com/geocode/v1/json?key=${location_key}&q=${search}&pretty=1&no_annotations=1&language=${curLang}`;
+    const location_url = `https://api.opencagedata.com/geocode/v1/json?key=${location_key}&q=${city}&pretty=1&no_annotations=1&language=${curLang}`;
     fetch(location_url)
         .then(data => data.json())
         .then(location => {
@@ -189,6 +183,11 @@ const loadForecast = function() {
             .then(data => {
                 let day;
                 let weekDay;
+                const options = { timeZone: data.timezone }
+                const localTime = new Date(new Date().toLocaleString('en-US', options));
+                const timeArr = `${localTime}`.split(' ');
+                weekDay = shortDay_EN.indexOf(timeArr[0]);
+                day = localTime.getDay();
                 function locationTime() {
                     locInt = setInterval(updateDate, 1000, data);
                 }
@@ -222,6 +221,7 @@ const loadForecast = function() {
                         dailyIcons.push(icons);
                     }
                 }
+                console.log(day)
                 getDailyWeather();
                 fav = data.currently.icon;
                 getFavicon(fav, document.querySelector('.favicon'));
@@ -392,6 +392,7 @@ function getDailyWeather() {
     if (curLang === 'en') {
         daysOfWeek = daysOfWeek_EN;
     }
+    console.log(daysOfWeek[daysForward[1]])
     for (let i = 0; i < 3; i += 1) {
         futureForecast.insertAdjacentHTML('beforeend', `
         <div class = "fut-weather">
