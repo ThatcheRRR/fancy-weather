@@ -49,6 +49,7 @@ let timeNow;
 let curWeather;
 let fav;
 let crd;
+let locInt;
 let usersInt;
 let myMap = null;
 
@@ -157,6 +158,7 @@ const usersLocationWeather = function() {
 
 const loadForecast = function() {
     clearInterval(usersInt);
+    clearInterval(locInt);
     currentWeatherCels.length = 0;
     currentWeatherFahr.length = 0;
     mapCoords.length = 0;
@@ -168,14 +170,17 @@ const loadForecast = function() {
     fetch(location_url)
         .then(data => data.json())
         .then(location => {
-            translate = `${location.results[0].components.city}, ${location.results[0].components.country}`;
+            translate = `${location.results[0].formatted}`;
             const weather_url = `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/29e270d552fb7ddfac1a8c371ae8dc03/${location.results[0].geometry.lat},${location.results[0].geometry.lng}?lang=${curLang}`;
             fetch(weather_url, { method: 'GET', mode: 'cors' })
             .then(forecast => forecast.json())
             .then(data => {
                 let day;
                 let weekDay;
-                setInterval(updateDate, 1000, data);
+                function locationTime() {
+                    locInt = setInterval(updateDate, 1000, data);
+                }
+                locationTime();
                 if (weekDay !== date.getDay()) {
                     for (let i = 2; i < 5; i += 1) {
                         day++;
