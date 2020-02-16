@@ -48,6 +48,7 @@ let translate;
 let timeNow;
 let curWeather;
 let fav;
+let usersInt;
 let myMap = null;
 
 function initMap(cords) {
@@ -115,15 +116,10 @@ const usersLocationWeather = function() {
                                 daysForward.push(day);
                                 dailyIcons.push(icons);
                             }
-                            const options = { timeZone: data.timezone }
-                            const localTime = new Date(new Date().toLocaleString('en-US', options));
-                            const timeArr = `${localTime}`.split(' ');
-                            const locTime = [];
-                            const timeConv = timeArr[4].split(':').slice(0, 2).join(':');
-                            const weekDay = shortDay_EN.indexOf(timeArr[0]);
-                            const month = localTime.getMonth();
-                            locTime.push(timeArr[2], timeConv, weekDay, month);
-                            getCurrentTime(locTime);
+                            function updateUsers() {
+                                usersInt = setInterval(updateDate, 1000, data);
+                            }
+                            updateUsers();
                             getDailyWeather();
                             fav = data.currently.icon;
                             getFavicon(fav, document.querySelector('.favicon'));
@@ -148,7 +144,8 @@ const usersLocationWeather = function() {
         });
 }
 
-const loadForecast = function(lang) {
+const loadForecast = function() {
+    clearInterval(usersInt);
     currentWeatherCels.length = 0;
     currentWeatherFahr.length = 0;
     mapCoords.length = 0;
@@ -156,26 +153,19 @@ const loadForecast = function(lang) {
     daysForward.length = 0;
     dailyCels.length = 0;
     dailyIcons.length = 0;
-    const location_url = `https://api.opencagedata.com/geocode/v1/json?key=${location_key}&q=${city}&pretty=1&no_annotations=1&language=${lang}`;
+    const location_url = `https://api.opencagedata.com/geocode/v1/json?key=${location_key}&q=${city}&pretty=1&no_annotations=1&language=${curLang}`;
     fetch(location_url)
         .then(data => data.json())
         .then(location => {
         getCity = location.results[0].formatted.split(',');
         translate = `${getCity[0]}, ${getCity[getCity.length - 1]}`;
-        const weather_url = `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/29e270d552fb7ddfac1a8c371ae8dc03/${location.results[0].geometry.lat},${location.results[0].geometry.lng}?lang=${lang}`;
+        const weather_url = `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/29e270d552fb7ddfac1a8c371ae8dc03/${location.results[0].geometry.lat},${location.results[0].geometry.lng}?lang=${curLang}`;
         fetch(weather_url, { method: 'GET', mode: 'cors' })
             .then(forecast => forecast.json())
             .then(data => {
-                const options = { timeZone: data.timezone }
-                const localTime = new Date(new Date().toLocaleString('en-US', options));
-                const timeArr = `${localTime}`.split(' ');
-                const weekDay = shortDay_EN.indexOf(timeArr[0]);
-                const month = localTime.getMonth();
-                const locTime = [];
-                const timeConv = timeArr[4].split(':').slice(0, 2).join(':');
-                let day = localTime.getDay();
-                locTime.push(timeArr[2], timeConv, weekDay, month);
-                getCurrentTime(locTime);
+                let day;
+                let weekDay;
+                setInterval(updateDate, 1000, data);
                 if (weekDay !== date.getDay()) {
                     for (let i = 2; i < 5; i += 1) {
                         day++;
@@ -231,6 +221,19 @@ function setIcon(icon, iconID) {
     const currentIcon = icon.replace(/-/g, '_').toUpperCase();
     skycons.play();
     return skycons.set(iconID, Skycons[currentIcon]);
+}
+
+function updateDate(data) {
+    const options = { timeZone: data.timezone }
+    const localTime = new Date(new Date().toLocaleString('en-US', options));
+    const timeArr = `${localTime}`.split(' ');
+    weekDay = shortDay_EN.indexOf(timeArr[0]);
+    const month = localTime.getMonth();
+    const locTime = [];
+    const timeConv = timeArr[4].split(':').slice(0, 2).join(':');
+    day = localTime.getDay();
+    locTime.push(timeArr[2], timeConv, weekDay, month);
+    getCurrentTime(locTime);
 }
 
 function getFavicon(icon, iconID) {
@@ -383,7 +386,7 @@ search.onmousemove = () => {
 }
 lang.addEventListener('change', (e) => {
     curLang = e.target.value.toLowerCase();
-    loadForecast(curLang);
+    loadForecast();
 });
 window.onload = () => {
     curLang = 'en';
@@ -398,7 +401,7 @@ window.onload = () => {
 celsius.addEventListener('click', changeTemp);
 fahrenheit.addEventListener('click', changeTemp);
 text.addEventListener('keydown', pressed);
-refresh.addEventListener('click', getImage);
+refresh.addEventListener('mousedown', getImage);
 search.addEventListener('click', getImage);
 window.onbeforeunload = () => {
     localStorage.setItem('usersLang', curLang);
