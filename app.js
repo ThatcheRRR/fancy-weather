@@ -16,7 +16,6 @@ const curIcon = document.querySelector('.cur-icon');
 const date = new Date();
 const enterCode = 13;
 
-const current_location_key = '32dd44973f7949';
 const location_key = '50409b6b8c43408ead81d59f9b847c18';
 const image_key = 'e63fc987bd14fc87fe8f840d5476f471c56691b6c8f80531381fcb0bb1b58d75';
 
@@ -107,7 +106,9 @@ const options = {
 
 navigator.geolocation.getCurrentPosition(success, error, options);
 
-const usersLocationWeather = function() {
+setTimeout(usersLocationWeather, 1);
+
+function usersLocationWeather() {
     const pos = `${crd.latitude}, ${crd.longitude}`;
         const location_url = `https://api.opencagedata.com/geocode/v1/json?key=${location_key}&q=${pos}&pretty=1&no_annotations=1&language=${curLang}`;
         fetch(location_url)
