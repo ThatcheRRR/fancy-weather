@@ -153,7 +153,6 @@ const usersLocationWeather = function() {
                     ymaps.ready(initMap(cords));
                 })
         })
-    // })
     .finally(() => {
         setTimeout(loaded, 2000);
         setInterval(setFavicon, 100);
@@ -412,7 +411,7 @@ window.onload = () => {
         lang.value = curLang.toUpperCase();
     }
     celsius.classList.add('active-temp');
-    usersLocationWeather();
+    setTimeout(usersLocationWeather, 1);
 }
 celsius.addEventListener('click', changeTemp);
 fahrenheit.addEventListener('click', changeTemp);

@@ -235,6 +235,7 @@ h1 {
 body {
   margin: 0;
   padding: 0 5%;
+  word-break: break-word;
   background-image: url("./assets/bg3.png");
   background-size: cover;
   background-repeat: no-repeat;
@@ -503,7 +504,7 @@ main {
       -ms-flex-pack: center;
           justify-content: center;
   z-index: 99999;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
@@ -660,7 +661,7 @@ main {
         -ms-flex-align: center;
             align-items: center;
     padding: 10px 0;
-    background-color: rgba(135, 206, 250, 0.5);
+    background-color: rgba(135, 206, 250, 0.7);
     border-radius: 20px;
     margin-bottom: 30px;
   }
@@ -669,7 +670,7 @@ main {
     margin-top: 20px;
     margin-bottom: 40px;
     padding: 10px;
-    background-color: rgba(135, 206, 250, 0.5);
+    background-color: rgba(135, 206, 250, 0.7);
     border-radius: 20px;
   }
 }
