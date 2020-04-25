@@ -50,7 +50,6 @@ let translate;
 let timeNow;
 let curWeather;
 let fav;
-let crd;
 let locInt;
 let usersInt;
 let myMap = null;
@@ -92,7 +91,8 @@ function getImage() {
 }
 
 function success(pos) {
-    crd = pos.coords;
+    const crd = pos.coords;
+    usersLocationWeather(crd);
 }
 
 function error(err) {
@@ -105,16 +105,19 @@ const options = {
     maximumAge: 0
 };
 
-navigator.geolocation.getCurrentPosition(success, error, options);
-
-const usersLocationWeather = function() {
+const usersLocationWeather = function(crd) {
     const pos = `${crd.latitude}, ${crd.longitude}`;
         const location_url = `https://api.opencagedata.com/geocode/v1/json?key=${location_key}&q=${pos}&pretty=1&no_annotations=1&language=${curLang}`;
         fetch(location_url)
         .then(locat => locat.json())
         .then(location => {
-            city = location.results[0].components.city;
-            translate = `${location.results[0].components.city}, ${location.results[0].components.country}`;
+            if (location.results[0].components.city === undefined) {
+                city = location.results[0].components.town;
+                translate = `${location.results[0].components.town}, ${location.results[0].components.country}`;
+            } else {
+                city = location.results[0].components.city;
+                translate = `${location.results[0].components.city}, ${location.results[0].components.country}`;
+            }
             return location;
         })
         .then(loc => {
@@ -411,7 +414,7 @@ window.onload = () => {
         lang.value = curLang.toUpperCase();
     }
     celsius.classList.add('active-temp');
-    setTimeout(usersLocationWeather, 1);
+    navigator.geolocation.getCurrentPosition(success, error, options);
 }
 celsius.addEventListener('click', changeTemp);
 fahrenheit.addEventListener('click', changeTemp);
