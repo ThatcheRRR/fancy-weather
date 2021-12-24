@@ -122,7 +122,7 @@ const usersLocationWeather = function(crd) {
         })
         .then(loc => {
             const weather_url = `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/29e270d552fb7ddfac1a8c371ae8dc03/${loc.results[0].geometry.lat},${loc.results[0].geometry.lng}?lang=${curLang}`;
-            fetch(weather_url, {headers: {}})
+            fetch(weather_url)
                 .then(weather => weather.json())
                 .then(data => {
                     for (let i = 1; i < 4; i += 1) {
@@ -179,7 +179,7 @@ const loadForecast = function() {
             getCity = location.results[0].formatted.split(',');
             translate = `${getCity[0]}, ${getCity[getCity.length - 1]}`;
             const weather_url = `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/29e270d552fb7ddfac1a8c371ae8dc03/${location.results[0].geometry.lat},${location.results[0].geometry.lng}?lang=${curLang}`;
-            fetch(weather_url, { method: 'GET', mode: 'cors' })
+            fetch(weather_url)
             .then(forecast => forecast.json())
             .then(data => {
                 updateDate(data);
@@ -401,7 +401,7 @@ function getDailyWeather() {
 search.addEventListener('click', loadForecast);
 search.onmousemove = () => {
     city = text.value;
-}
+};
 lang.addEventListener('change', (e) => {
     curLang = e.target.value.toLowerCase();
     loadForecast();
@@ -423,4 +423,4 @@ refresh.addEventListener('mousedown', getImage);
 search.addEventListener('click', getImage);
 window.onbeforeunload = () => {
     localStorage.setItem('usersLang', curLang);
-}
+};
