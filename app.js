@@ -121,7 +121,7 @@ const usersLocationWeather = function(crd) {
             return location;
         })
         .then(loc => {
-            const weather_url = `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/29e270d552fb7ddfac1a8c371ae8dc03/${loc.results[0].geometry.lat},${loc.results[0].geometry.lng}?lang=${curLang}`;
+            const weather_url = `https://proxy.cors.sh/https://api.darksky.net/forecast/29e270d552fb7ddfac1a8c371ae8dc03/${loc.results[0].geometry.lat},${loc.results[0].geometry.lng}?lang=${curLang}`;
             fetch(weather_url)
                 .then(weather => weather.json())
                 .then(data => {
@@ -178,7 +178,7 @@ const loadForecast = function() {
         .then(location => {
             getCity = location.results[0].formatted.split(',');
             translate = `${getCity[0]}, ${getCity[getCity.length - 1]}`;
-            const weather_url = `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/29e270d552fb7ddfac1a8c371ae8dc03/${location.results[0].geometry.lat},${location.results[0].geometry.lng}?lang=${curLang}`;
+            const weather_url = `https://proxy.cors.sh/https://api.darksky.net/forecast/29e270d552fb7ddfac1a8c371ae8dc03/${location.results[0].geometry.lat},${location.results[0].geometry.lng}?lang=${curLang}`;
             fetch(weather_url)
             .then(forecast => forecast.json())
             .then(data => {
